@@ -44,6 +44,29 @@ pipeline {
                 '''
             }
         }
+stage('Deploy to Azure') {
+    steps {
+        echo "🚀 Deploying Azure Function App: %AZURE_FUNCTIONAPP_NAME%"
+        bat '''
+        echo === Current Directory ===
+        cd
+        dir
+
+        echo === Deploying with verbose logs ===
+        call npx azure-functions-core-tools@4 azure functionapp publish %AZURE_FUNCTIONAPP_NAME% --verbose > deploy.log 2>&1
+
+        echo === DEPLOYMENT LOGS ===
+        type deploy.log
+
+        if %ERRORLEVEL% NEQ 0 (
+            echo ❌ Deployment failed. See above logs.
+            exit /b 1
+        ) else (
+            echo ✅ Deployment successful.
+        )
+        '''
+    }
+}
 
         stage('Deploy to Azure') {
             steps {
