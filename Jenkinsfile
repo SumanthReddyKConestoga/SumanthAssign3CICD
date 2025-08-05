@@ -6,16 +6,17 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
-                echo '📦 Checking out source code...'
+                echo '📦 Checking out code...'
                 checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                echo '📦 Installing node modules...'
+                echo '📦 Installing dependencies...'
                 bat '''
                 call npm install || exit 0
                 '''
@@ -24,28 +25,43 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                echo '🧪 Running test suite...'
+                echo '🧪 Running test cases...'
                 bat '''
                 call npm test || exit 0
                 '''
             }
         }
 
-        stage('Check Azure CLI & Session') {
+        stage('Verify Azure CLI & Login') {
             steps {
-                echo '🔍 Verifying Azure CLI login...'
+                echo '🔐 Verifying Azure CLI authentication...'
                 bat '''
                 az --version
-                az account show || exit 1
+                az account show || (
+                    echo ❌ Not logged into Azure CLI.
+                    exit /b 1
+                )
                 '''
             }
         }
 
         stage('Deploy to Azure') {
             steps {
-                echo "🚀 Deploying Function App to Azure: %AZURE_FUNCTIONAPP_NAME%"
+                echo "🚀 Deploying Azure Function App: %AZURE_FUNCTIONAPP_NAME%"
                 bat '''
-                call npx azure-functions-core-tools@4 azure functionapp publish %AZURE_FUNCTIONAPP_NAME% || exit 1
+                echo === Current Working Directory ===
+                cd
+                dir
+
+                echo === Deploying to Azure ===
+                call npx azure-functions-core-tools@4 azure functionapp publish %AZURE_FUNCTIONAPP_NAME% --verbose
+
+                if %ERRORLEVEL% NEQ 0 (
+                    echo ❌ Deployment failed.
+                    exit /b 1
+                ) else (
+                    echo ✅ Deployment successful.
+                )
                 '''
             }
         }
@@ -53,10 +69,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Pipeline completed successfully.'
+            echo '✅ Pipeline finished successfully.'
         }
         failure {
-            echo '❌ Pipeline failed. Check above logs.'
+            echo '❌ Pipeline failed. Check the logs above.'
         }
     }
 }
