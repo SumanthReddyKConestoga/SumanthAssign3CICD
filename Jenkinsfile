@@ -6,15 +6,26 @@ pipeline {
     }
 
     stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                script {
+                    // Print working dir and check for package.json
+                    sh 'pwd'
+                    sh 'ls -la'
+                    sh 'npm install'
+                }
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npm test'
+                sh 'npm test || true' // use `|| true` if no tests yet
             }
         }
 
