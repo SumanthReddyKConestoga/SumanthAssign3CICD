@@ -14,9 +14,9 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh '''
-                pwd
-                ls -la
+                bat '''
+                echo Installing Node Modules...
+                dir
                 npm install
                 '''
             }
@@ -24,16 +24,18 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh '''
-                npm test || true
+                bat '''
+                echo Running tests...
+                npm test || exit 0
                 '''
             }
         }
 
         stage('Deploy to Azure') {
             steps {
-                sh '''
-                npx azure-functions-core-tools@4 azure functionapp publish $AZURE_FUNCTIONAPP_NAME
+                bat '''
+                echo Deploying to Azure...
+                npx azure-functions-core-tools@4 azure functionapp publish %AZURE_FUNCTIONAPP_NAME%
                 '''
             }
         }
