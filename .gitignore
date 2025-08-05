@@ -1,0 +1,77 @@
+# -------------------------
+# Node.js dependencies
+# -------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# -------------------------
+# Azure Functions
+# -------------------------
+.local.settings.json
+*.swp
+*.tmp
+az/
+
+# -------------------------
+# Logs and build artifacts
+# -------------------------
+*.log
+*.out
+*.tsbuildinfo
+
+# -------------------------
+# IDE / Editor configs
+# -------------------------
+.vscode/
+.idea/
+*.code-workspace
+
+# -------------------------
+# OS junk files
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Python (if you're using py in tests)
+# -------------------------
+__pycache__/
+*.py[cod]
+
+# -------------------------
+# Environment files
+# -------------------------
+.env
+.env.*
+
+# -------------------------
+# Jenkins/CI/CD
+# -------------------------
+*.jenkins*
+pipeline.log
+*.bak
+*.old
+
+# -------------------------
+# Coverage / Test outputs
+# -------------------------
+coverage/
+nyc_output/
+test-results/
+reports/
+
+# -------------------------
+# Git
+# -------------------------
+.git/
+*.orig
+
+# -------------------------
+# Others (adjust as needed)
+# -------------------------
+*.zip
+*.tar.gz
+*.7z
