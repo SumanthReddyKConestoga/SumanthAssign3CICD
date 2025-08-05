@@ -9,14 +9,14 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                echo '📦 Checking out code...'
+                echo '📦 Checking out source code...'
                 checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                echo '📦 Installing dependencies...'
+                echo '📦 Installing node modules...'
                 bat '''
                 call npm install || exit 0
                 '''
@@ -25,7 +25,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                echo '🧪 Running test cases...'
+                echo '🧪 Running tests...'
                 bat '''
                 call npm test || exit 0
                 '''
@@ -34,39 +34,16 @@ pipeline {
 
         stage('Verify Azure CLI & Login') {
             steps {
-                echo '🔐 Verifying Azure CLI authentication...'
+                echo '🔐 Verifying Azure CLI session...'
                 bat '''
                 az --version
                 az account show || (
-                    echo ❌ Not logged into Azure CLI.
+                    echo ❌ Not logged in to Azure CLI.
                     exit /b 1
                 )
                 '''
             }
         }
-stage('Deploy to Azure') {
-    steps {
-        echo "🚀 Deploying Azure Function App: %AZURE_FUNCTIONAPP_NAME%"
-        bat '''
-        echo === Current Directory ===
-        cd
-        dir
-
-        echo === Deploying with verbose logs ===
-        call npx azure-functions-core-tools@4 azure functionapp publish %AZURE_FUNCTIONAPP_NAME% --verbose > deploy.log 2>&1
-
-        echo === DEPLOYMENT LOGS ===
-        type deploy.log
-
-        if %ERRORLEVEL% NEQ 0 (
-            echo ❌ Deployment failed. See above logs.
-            exit /b 1
-        ) else (
-            echo ✅ Deployment successful.
-        )
-        '''
-    }
-}
 
         stage('Deploy to Azure') {
             steps {
@@ -76,14 +53,18 @@ stage('Deploy to Azure') {
                 cd
                 dir
 
-                echo === Deploying to Azure ===
-                call npx azure-functions-core-tools@4 azure functionapp publish %AZURE_FUNCTIONAPP_NAME% --verbose
+                echo === Deploying with Azure Core Tools ===
+                call npx azure-functions-core-tools@4 azure functionapp publish %AZURE_FUNCTIONAPP_NAME% --verbose > deploy.log 2>&1
+
+                echo === DEPLOYMENT LOG START ===
+                type deploy.log
+                echo === DEPLOYMENT LOG END ===
 
                 if %ERRORLEVEL% NEQ 0 (
-                    echo ❌ Deployment failed.
+                    echo ❌ Azure deployment failed.
                     exit /b 1
                 ) else (
-                    echo ✅ Deployment successful.
+                    echo ✅ Azure deployment succeeded.
                 )
                 '''
             }
@@ -92,10 +73,10 @@ stage('Deploy to Azure') {
 
     post {
         success {
-            echo '✅ Pipeline finished successfully.'
+            echo '✅ Pipeline completed successfully!'
         }
         failure {
-            echo '❌ Pipeline failed. Check the logs above.'
+            echo '❌ Pipeline failed. Check logs above.'
         }
     }
 }
