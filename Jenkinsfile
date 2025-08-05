@@ -14,24 +14,27 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                script {
-                    // Print working dir and check for package.json
-                    sh 'pwd'
-                    sh 'ls -la'
-                    sh 'npm install'
-                }
+                sh '''
+                pwd
+                ls -la
+                npm install
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'npm test || true' // use `|| true` if no tests yet
+                sh '''
+                npm test || true
+                '''
             }
         }
 
         stage('Deploy to Azure') {
             steps {
-                sh 'npx azure-functions-core-tools@4 azure functionapp publish $AZURE_FUNCTIONAPP_NAME'
+                sh '''
+                npx azure-functions-core-tools@4 azure functionapp publish $AZURE_FUNCTIONAPP_NAME
+                '''
             }
         }
     }
